@@ -1,4 +1,4 @@
-# vscode-profile-shuffler README
+# vscode-profile-shuffler
 
 An attempt to make a vscode extension to move extensions between vscode profiles, for which I could see no easy way.
 
