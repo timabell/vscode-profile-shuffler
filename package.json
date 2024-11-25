@@ -1,10 +1,14 @@
 {
   "name": "vscode-profile-shuffler",
   "displayName": "vscode-profile-shuffler",
-  "description": "",
+  "description": "https://github.com/timabell/vscode-profile-shuffler",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.95.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/timabell/vscode-profile-shuffler.git"
   },
   "categories": [
     "Other"
@@ -22,13 +26,15 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
     "test": "vscode-test",
-    "package": "vsce package"
+    "vscode:package": "npm run compile",
+    "package": "vsce package",
+    "prepublish": "npm run package",
+    "publish": "vsce publish"
   },
   "devDependencies": {
     "@types/vscode": "^1.95.0",
