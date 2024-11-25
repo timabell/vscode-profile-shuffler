@@ -3,21 +3,16 @@ import { exec } from 'child_process';
 
 export function activate(context: vscode.ExtensionContext) {
     let disposable = vscode.commands.registerCommand('extension.moveExtensions', async () => {
-        const profiles = await getProfiles();
-        if (!profiles) {
-            vscode.window.showErrorMessage('No profiles found.');
-            return;
-        }
+        const extensions = vscode.extensions.all.map(ext => ext.id);
 
-        const selectedProfile = await vscode.window.showQuickPick(profiles, {
-            placeHolder: 'Select the profile to move extensions to'
+        const profile = await vscode.window.showInputBox({
+            placeHolder: 'Enter the profile name to move extensions to'
         });
 
-        if (!selectedProfile) {
+        if (!profile) {
             return;
         }
 
-        const extensions = vscode.extensions.all.map(ext => ext.id);
         const selectedExtensions = await vscode.window.showQuickPick(extensions, {
             canPickMany: true,
             placeHolder: 'Select extensions to move'
@@ -27,25 +22,26 @@ export function activate(context: vscode.ExtensionContext) {
             return;
         }
 
-        moveExtensions(selectedExtensions, selectedProfile);
+        moveExtensions(selectedExtensions, profile);
     });
 
     context.subscriptions.push(disposable);
 }
 
-async function getProfiles(): Promise<string[]> {
-    // Replace this with actual logic to get profiles if available
-    return ['Profile 1', 'Profile 2', 'Profile 3'];
-}
-
 function moveExtensions(extensions: string[], profile: string) {
     extensions.forEach(extension => {
-        exec(`code --profile ${profile} --install-extension ${extension}`, (error, stdout, stderr) => {
-            if (error) {
-                vscode.window.showErrorMessage(`Error moving extension ${extension}: ${stderr}`);
+        exec(`code --profile ${profile} --install-extension ${extension}`, (installError, installStdout, installStderr) => {
+            if (installError) {
+                vscode.window.showErrorMessage(`Error installing extension ${extension} to profile ${profile}: ${installStderr}`);
                 return;
             }
-            vscode.window.showInformationMessage(`Moved extension ${extension} to profile ${profile}`);
+            exec(`code --uninstall-extension ${extension}`, (uninstallError, uninstallStdout, uninstallStderr) => {
+                if (uninstallError) {
+                    vscode.window.showErrorMessage(`Error uninstalling extension ${extension}: ${uninstallStderr}`);
+                    return;
+                }
+                vscode.window.showInformationMessage(`Moved extension ${extension} to profile ${profile}`);
+            });
         });
     });
 }
