@@ -1,26 +1,32 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+    let disposable = vscode.commands.registerCommand('extension.moveExtensions', async () => {
+        const profiles = await vscode.window.showQuickPick(
+            ['Profile 1', 'Profile 2'], // Replace with actual profile names
+            { placeHolder: 'Select the profile to move extensions to' }
+        );
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "vscode-profile-shuffler" is now active!');
+        if (!profiles) {
+            return;
+        }
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('vscode-profile-shuffler.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from vscode-profile-shuffler!');
-	});
+        const extensions = vscode.extensions.all.map(ext => ext.id);
+        const selectedExtensions = await vscode.window.showQuickPick(extensions, {
+            canPickMany: true,
+            placeHolder: 'Select extensions to move'
+        });
 
-	context.subscriptions.push(disposable);
+        if (!selectedExtensions) {
+            return;
+        }
+
+        // Logic to move extensions between profiles
+        // This is a placeholder, as VS Code API does not directly support profile management
+        vscode.window.showInformationMessage(`Moved ${selectedExtensions.length} extensions to ${profiles}`);
+    });
+
+    context.subscriptions.push(disposable);
 }
 
-// This method is called when your extension is deactivated
 export function deactivate() {}
