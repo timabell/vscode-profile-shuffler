@@ -9,13 +9,15 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+      "onCommand:extension.moveExtensions"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "vscode-profile-shuffler.helloWorld",
-        "title": "Hello World"
+        "command": "extension.moveExtensions",
+        "title": "Move Extensions"
       }
     ]
   },
