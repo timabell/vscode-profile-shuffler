@@ -30,12 +30,12 @@ export function activate(context: vscode.ExtensionContext) {
 
 function moveExtensions(extensions: string[], profile: string) {
     extensions.forEach(extension => {
-        exec(`code --profile ${profile} --install-extension ${extension}`, (installError, installStdout, installStderr) => {
+        exec(`code --profile '${profile}' --install-extension '${extension}'`, (installError, installStdout, installStderr) => {
             if (installError) {
                 vscode.window.showErrorMessage(`Error installing extension ${extension} to profile ${profile}: ${installStderr}`);
                 return;
             }
-            exec(`code --uninstall-extension ${extension}`, (uninstallError, uninstallStdout, uninstallStderr) => {
+            exec(`code --uninstall-extension '${extension}'`, (uninstallError, uninstallStdout, uninstallStderr) => {
                 if (uninstallError) {
                     vscode.window.showErrorMessage(`Error uninstalling extension ${extension}: ${uninstallStderr}`);
                     return;
