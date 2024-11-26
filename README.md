@@ -12,12 +12,12 @@ Hacked together with github co-pilot
 
 Usage:
 
-1. Ctrl-Shift-P
-2. Move Extensions
-3. Enter target profile name (can't find a way to list profiles, patches welcome)
-4. Choose extensions to move
-5. Press okay to move extensions to new profile
-
+1. Ctrl-Shift-P (open command palette)
+2. Move Extensions (or Copy Extensions if you want to keep both)
+3. Enter source profile name (Defaults to 'Default')
+4. Enter target profile name (can't find a way to list profiles, patches welcome)
+5. Choose extensions to move/copy
+6. Press okay to move extensions to new profile
 
 ## Publishing an extension
 

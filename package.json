@@ -22,7 +22,11 @@
     "commands": [
       {
         "command": "extension.moveExtensions",
-        "title": "Move Extensions"
+        "title": "Move Extensions To Profile"
+      },
+      {
+        "command": "extension.copyExtensions",
+        "title": "Copy Extensions To Profile"
       }
     ]
   },
