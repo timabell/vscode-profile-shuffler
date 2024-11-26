@@ -1,15 +1,33 @@
 import * as vscode from 'vscode';
 import { exec } from 'child_process';
 
-export function activate(context: vscode.ExtensionContext) {
-    let disposable = vscode.commands.registerCommand('extension.moveExtensions', async () => {
-        const extensions = vscode.extensions.all.map(ext => ext.id);
+let outputChannel: vscode.OutputChannel;
 
-        const profile = await vscode.window.showInputBox({
-            placeHolder: 'Enter the profile name to move extensions to'
+export function activate(context: vscode.ExtensionContext) {
+    outputChannel = vscode.window.createOutputChannel('Profile Shuffler');
+    context.subscriptions.push(outputChannel);
+
+    let disposable = vscode.commands.registerCommand('extension.moveExtensions', async () => {
+        const sourceProfile = await vscode.window.showInputBox({
+            placeHolder: 'Enter the source profile name to move extensions from',
+            value: 'Default'
         });
 
-        if (!profile) {
+        if (!sourceProfile) {
+            return;
+        }
+
+        const targetProfile = await vscode.window.showInputBox({
+            placeHolder: 'Enter the target profile name to move extensions to'
+        });
+
+        if (!targetProfile) {
+            return;
+        }
+
+        const extensions = await getExtensionsForProfile(sourceProfile);
+        if (!extensions) {
+            vscode.window.showErrorMessage(`Failed to get extensions for profile ${sourceProfile}`);
             return;
         }
 
@@ -22,26 +40,47 @@ export function activate(context: vscode.ExtensionContext) {
             return;
         }
 
-        moveExtensions(selectedExtensions, profile);
+        moveExtensions(selectedExtensions, sourceProfile, targetProfile);
     });
 
     context.subscriptions.push(disposable);
 }
 
-function moveExtensions(extensions: string[], profile: string) {
-    extensions.forEach(extension => {
-        exec(`code --profile '${profile}' --install-extension '${extension}'`, (installError, installStdout, installStderr) => {
-            if (installError) {
-                vscode.window.showErrorMessage(`Error installing extension ${extension} to profile ${profile}: ${installStderr}`);
+function getExtensionsForProfile(profile: string): Promise<string[]> {
+    return new Promise((resolve, reject) => {
+        const command = `code --list-extensions --profile '${profile}'`;
+        outputChannel.appendLine(`Running command: ${command}`);
+        exec(command, (error, stdout, stderr) => {
+            if (error) {
+                outputChannel.appendLine(`Error listing extensions for profile ${profile}: ${stderr}`);
+                reject(`Error listing extensions for profile ${profile}: ${stderr}`);
                 return;
             }
-            exec(`code --uninstall-extension '${extension}'`, (uninstallError, uninstallStdout, uninstallStderr) => {
-                if (uninstallError) {
-                    vscode.window.showErrorMessage(`Error uninstalling extension ${extension}: ${uninstallStderr}`);
-                    return;
-                }
-                vscode.window.showInformationMessage(`Moved extension ${extension} to profile ${profile}`);
-            });
+            const extensions = stdout.split('\n').filter(ext => ext.trim() !== '');
+            resolve(extensions);
+        });
+    });
+}
+
+function moveExtensions(extensions: string[], sourceProfile: string, targetProfile: string) {
+    extensions.forEach(extension => {
+        runCommand(`code --profile '${targetProfile}' --install-extension '${extension}'`, `Error installing extension ${extension} to profile ${targetProfile}`)
+            .then(() => runCommand(`code --profile '${sourceProfile}' --uninstall-extension '${extension}'`, `Error uninstalling extension ${extension} from profile ${sourceProfile}`))
+            .then(() => vscode.window.showInformationMessage(`Moved extension ${extension} from profile ${sourceProfile} to profile ${targetProfile}`))
+            .catch(error => vscode.window.showErrorMessage(error));
+    });
+}
+
+function runCommand(command: string, errorMessage: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+        outputChannel.appendLine(`Running command: ${command}`);
+        exec(command, (error, stdout, stderr) => {
+            if (error) {
+                outputChannel.appendLine(`${errorMessage}: ${stderr}`);
+                reject(`${errorMessage}: ${stderr}`);
+                return;
+            }
+            resolve();
         });
     });
 }
