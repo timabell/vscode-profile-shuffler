@@ -3,7 +3,7 @@
   "displayName": "vscode-profile-shuffler",
   "description": "https://github.com/timabell/vscode-profile-shuffler",
   "publisher": "timabell",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "engines": {
     "vscode": "^1.95.0"
   },
