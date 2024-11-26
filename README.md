@@ -2,6 +2,12 @@
 
 An attempt to make a vscode extension to move extensions between vscode profiles, for which I could see no easy way.
 
+<https://marketplace.visualstudio.com/items?itemName=timabell.vscode-profile-shuffler>
+
+<https://github.com/timabell/vscode-profile-shuffler>
+
+AGPL-3.0 license
+
 Hacked together with github co-pilot
 
 Usage:
@@ -17,9 +23,9 @@ Usage:
 
 This is completely bananas. Recorded here because I won't remember it
 
-https://code.visualstudio.com/api/working-with-extensions/publishing-extension#publishing-extensions
+<https://code.visualstudio.com/api/working-with-extensions/publishing-extension#publishing-extensions>
 
-Create a publishing account (timabell) over here: https://marketplace.visualstudio.com/manage/publishers/timabell
+Create a publishing account (timabell) over here: <https://marketplace.visualstudio.com/manage/publishers/timabell>
 
 Then in this completely different place in the derelict temple of ~~Visual Studio Online~~ Azure DevOops:
 
