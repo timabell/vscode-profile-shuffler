@@ -31,14 +31,22 @@ export function activate(context: vscode.ExtensionContext) {
             return;
         }
 
-        const selectedExtensions = await vscode.window.showQuickPick(extensions, {
+        const extensionMap = getExtensionMap();
+        const displayNames = extensions.map(id => extensionMap[id] || id);
+
+        const selectedDisplayNames = await vscode.window.showQuickPick(displayNames, {
             canPickMany: true,
             placeHolder: 'Select extensions to move'
         });
 
-        if (!selectedExtensions) {
+        if (!selectedDisplayNames) {
             return;
         }
+
+        const selectedExtensions = selectedDisplayNames.map(name => {
+            const entry = Object.entries(extensionMap).find(([, displayName]) => displayName === name);
+            return entry ? entry[0] : name;
+        });
 
         moveExtensions(selectedExtensions, sourceProfile, targetProfile);
     });
@@ -60,6 +68,15 @@ function getExtensionsForProfile(profile: string): Promise<string[]> {
             resolve(extensions);
         });
     });
+}
+
+function getExtensionMap(): { [id: string]: string } {
+    const map: { [id: string]: string } = {};
+    vscode.extensions.all.forEach(ext => {
+        const displayName = ext.packageJSON.displayName;
+        map[ext.id] = displayName ? `${displayName} (${ext.id})` : ext.id;
+    });
+    return map;
 }
 
 function moveExtensions(extensions: string[], sourceProfile: string, targetProfile: string) {
